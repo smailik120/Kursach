@@ -1,6 +1,5 @@
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-
 import javax.swing.JFrame;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -12,13 +11,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
-
 import WorkWithBd.Database;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,6 +35,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	private String [] priceAttack;
 	private String[][] meansGame;
 	private JTable tableAttacks;
+	private Matrix matrix;
 	private JTable tableDefense;
 	private JTable game;
 	private HashMap map;
@@ -46,7 +43,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	private Mathematics mat;
 	CheckModel modelGame;
 	private DefaultTableModel tableModel;
-	private JPanel buttons;
+	private Box buttons;
 	private JLabel message;
 	public GameTable(int coordinateX,int coordinateY,int sizeX,int sizeY, String name) throws SQLException
 	{
@@ -62,7 +59,12 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	@Override
 	public void CreateFrame()  
 	{
-  		String nameForChooseTableAttack[] = {"¹", "attack name", "Choose"};
+  		init();
+        createPanel();
+	}
+	
+	public void init() {
+		String nameForChooseTableAttack[] = {"¹", "attack name", "Choose"};
   		String [][] meansAttack = new String[FieldAttack.length][3];
   		String nameForChooseTableDefense[] = {"¹", "defense name", "Choose"};
   		String [][] meansDefense = new String[FieldDefense.length][3];
@@ -75,9 +77,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
         contents.add(new JScrollPane(game, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
         contents.add(new JScrollPane(chooseDefense));
         setContentPane(contents);
-        createPanel();
 	}
-	
 	void build() throws SQLException {
 		FieldAttack = Database.getInstance().getFieldFromTable("attacks", "unicname");
 		FieldDefense = Database.getInstance().getFieldFromTable("defense", "unicname");
@@ -98,24 +98,15 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		return new JTable(modelGame);
 	}
 	
-	
-	public final static void setColumnsWidth(JTable table) {
-	    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	    JTableHeader th = table.getTableHeader();
-	    for (int i = 0; i < table.getColumnCount(); i++) {
-	        TableColumn column = table.getColumnModel().getColumn(i);
-	        int prefWidth = 
-	            Math.round(
-	                (float) th.getFontMetrics(
-	                    th.getFont()).getStringBounds(th.getTable().getColumnName(i),
-	                    th.getGraphics()
-	                ).getWidth()
-	            );
-	        column.setPreferredWidth(prefWidth + 100);
-	    }
+	public void buildGameTable() throws SQLException {
+		FillContentMainMatrix();
+		DefaultTableModel tableModel = new DefaultTableModel(meansGame, new String[mat.sumOfCombinations(FieldDefense.length) + 1]);
+		game.setModel(tableModel); 
+		game.getTableHeader().setUI(null);
+		game.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	}
 	
-	public void buildGameTable() throws SQLException {
+	void FillContentMainMatrix() {
 		int sizeX = mat.sumOfCombinations(FieldAttack.length) + 1;
 		int sizeY = mat.sumOfCombinations(FieldDefense.length) + 1;
 		String[] defenderNames = new String[sizeY];
@@ -131,6 +122,10 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 			attackerNames[i - 1] = "Attacker " + Integer.toString(i - 1);
 			meansGame[i - 1][0] = attackerNames[i - 1];
 		}
+		fillMeansGame();
+	}
+	
+	void fillMeansGame() {
 		int i = 0;
 		int j = 0;
 		for(String at:strategiesAttack) {
@@ -146,16 +141,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 					sum += Integer.parseInt(priceAttack[Character.getNumericValue(at.charAt(a)) - 1]);
 				}
 				meansGame[i][j] = Integer.toString(sum);
-				System.out.println(meansGame[i][j]);
 			}
 			j = 0;
 		}
-		DefaultTableModel tableModel = new DefaultTableModel(meansGame, defenderNames);
-		game.setModel(tableModel); 
-		game.getTableHeader().setUI(null);
-		game.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		matrix = new Matrix(meansGame);
 	}
-	
 	void createButton() 
 	{
 		JButton create = new JButton("Create Game");
@@ -172,12 +162,25 @@ public class GameTable extends BaseFrame implements InterfaceObject{
         buttons.add(create);
 	}
 	
+	void createSeddleButton() 
+	{
+		JButton seddle = new JButton("Minimax");
+        seddle.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+					System.out.println(matrix.getSeddlePoint());
+					message.setText("result with minimax:" + Integer.toString(matrix.getSeddlePoint()));
+            }
+        });
+        buttons.add(seddle);
+	}
+	
 	public void createPanel() 
 	{
-		buttons = new JPanel();
-		createMessageError();
+		buttons = new Box(BoxLayout.Y_AXIS);
 		createButton();
-		getContentPane().add(buttons, "South");
+		createSeddleButton();
+		createMessageError();
+		getContentPane().add(buttons, "North");
 	}
 	
 	
