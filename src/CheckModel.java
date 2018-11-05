@@ -22,4 +22,5 @@ public class CheckModel extends DefaultTableModel {
 	public boolean isCellEditable(int row, int column) {
 		return column == 2 || column == 1 || column == 0;
 	}
+	
 }

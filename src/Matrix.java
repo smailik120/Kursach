@@ -6,22 +6,43 @@ public class Matrix {
 	}
 	
 	public int getSeddlePoint() {
-		System.out.println(array.length);
 		int min = 1000000;
 		int max = -min;
-		for(int i = 1; i < array.length; i++)
+		int result = 0;
+		for(int i = 1; i < array[0].length; i++)
 		{
-			for(int j = 1; j < array[i].length; j++)
+			for(int j = 1; j < array.length; j++)
 			{
-				if(Integer.parseInt(array[i][j]) <= min) {
-					min = Integer.parseInt(array[i][j]);
+				if(Integer.parseInt(array[j][i]) >= max) {
+					max = Integer.parseInt(array[j][i]);
 				}
 			}
-			if(min >= max) {
-				max = min;
+			if(max <= min) {
+				min = max;
+				result = i;
 			}
-			min = 1000000;
+			max = -1000000;
 		}
-		return max;
+		return result;
 	}
+	
+	public int getBaes(String[][] probabilties) {
+		double min = 1000000;
+		int result = 0;
+		double sum = 0;
+		for(int i = 1; i < array[0].length; i++)
+		{
+			for(int j = 1; j < array.length; j++)
+			{
+				sum += Integer.parseInt(array[j][i]) * Double.parseDouble(probabilties[j - 1][0]);
+			}
+			if(sum <= min) {
+				min = sum;
+				result = i;
+			}
+			sum = 0;
+		}
+		return result;
+	}
+	
 }

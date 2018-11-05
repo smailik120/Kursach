@@ -3,5 +3,5 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 public interface Work {
-	public TreeSet<String> work(int sizeY);
+	public TreeSet<ArrayList<String>> work(ArrayList<Strategy> array);
 }
