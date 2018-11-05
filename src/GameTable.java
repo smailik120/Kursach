@@ -200,7 +200,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	}
 	
 	void FillContentMainMatrix() {
-		int sizeX = mat.sumOfCombinations(FieldAttack.length) + 1;
+		int sizeX = mat.sumOfCombinations(attack.size()) + 1;
 		int sizeY = mat.sumOfCombinations(defense.size()) + 1;
 		String[] defenderNames = new String[sizeY];
 		String[] attackerNames = new String[sizeX];
@@ -222,12 +222,24 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		int i = 0;
 		int j = 0;
 		int tempSize = 0;
-		ArrayList<String> temp = new ArrayList<>();
+		String[] temp;
+		String[] tempAt;
 		for(ArrayList<String> at:strategiesAttack) {
 			i++;
 			for(ArrayList<String> def:strategiesDefense) {
 				j++;
 				int sum = 0;
+				temp = def.get(0).split(" ");
+				tempAt = at.get(0).split(" ");
+				for(int d = 0; d < temp.length; d++) {
+					sum += Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[2]);
+					//sum += Integer.parseInt(priceDefense[Character.getNumericValue(def.get(0).charAt(d)) - 1]);
+				}
+				for(int a = 0; a < tempAt.length; a++) {
+					sum += Integer.parseInt(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[2]);
+					//sum += Integer.parseInt(priceAttack[Character.getNumericValue(at.get(0).charAt(a)) - 1]);
+				}
+				/*
 				for(int d = 0; d < def.get(0).length(); d++) {
 					sum += Integer.parseInt(defense.get(Character.getNumericValue(def.get(0).charAt(d)) - 1).getStrategy()[2]);
 					//sum += Integer.parseInt(priceDefense[Character.getNumericValue(def.get(0).charAt(d)) - 1]);
@@ -236,7 +248,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 					sum += Integer.parseInt(attack.get(Character.getNumericValue(at.get(0).charAt(a)) - 1).getStrategy()[2]);
 					//sum += Integer.parseInt(priceAttack[Character.getNumericValue(at.get(0).charAt(a)) - 1]);
 				}
-				System.out.println(defense.toString());
+				*/
 				meansGame[i][j] = Integer.toString(sum);
 			}
 			j = 0;
@@ -292,20 +304,17 @@ public class GameTable extends BaseFrame implements InterfaceObject{
             	String[] Defend = {"¹", "unicname","cost","info","unicgroup"};
             	String[][] info = new String[optimal.length()][Defend.length];
             	int counter = 0;
-            	System.out.println(optimal);
             	int i = 0;
             	int j = 0;
             	for(ArrayList<String> def:strategiesDefense) {
             		i++;
             		if(Integer.toString(i).equals(optimal)) {
-            			System.out.println(defense.size());
-            			for(int k = 0; k < def.size(); k++) {
+            			String[] temp;
+            			temp = def.get(0).split(" ");
+            			for(int k = 0; k < temp.length; k++) {
             			for(Strategy strategy:defense) {
                         		j++;
-                        		System.out.println(j);
-                        		if (def.get(k).equals(Integer.toString(j))) {
-                        			System.out.println("stas");
-                        			
+                        		if (temp[k].equals(Integer.toString(j))) {
                         				info[counter] = strategy.getStrategy();
                         				counter++;
                         		}
