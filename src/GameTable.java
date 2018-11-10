@@ -192,16 +192,44 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		strategiesDefense = worker.work(defense);
 		strategiesAttack = new TreeSet<ArrayList<String>>();
 		strategiesAttack = worker.work(attack);
+		HashSet<Pair<String, String>> compability = new HashSet<Pair<String, String>>();
+		ArrayList<ArrayList<String>> array = new ArrayList<ArrayList<String>>();
+		String[][] comp = Database.getInstance().getTable("compability_defense", 3);
+		for(int i = 0; i < comp.length; i++) {
+			compability.add(new Pair<String, String>(comp[i][1], comp[i][2]));
+		}
+		int prov = 0;
+		//delete not compability
+		for(ArrayList<String> def:strategiesDefense) {
+			prov = 0;
+			String[] temp = def.get(0).split(" ");
+			for(int d = 0; d < temp.length; d++) {
+				for(int j = 0; j < temp.length; j++) {
+					if(compability.contains(new Pair<String, String> (defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0], defense.get(Integer.parseInt(temp[j]) - 1).getStrategy()[0]))) {
+					//if(compability.containsKey(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]) && defense.get(Integer.parseInt(temp[j]) - 1).getStrategy()[0].equals(compability.get(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]))) {
+						System.out.println("keyyy"+ temp[j]);
+						prov++;
+					}
+			}
+			}
+			if(prov > 0) {
+				array.add(def);
+			}
+		}
+		for(ArrayList<String> def:array) {
+			strategiesDefense.remove(def);
+		}
 		FillContentMainMatrix();
 		DefaultTableModel tableModel = new DefaultTableModel(meansGame, new String[mat.sumOfCombinations(FieldDefense.length) + 1]);
 		game.setModel(tableModel); 
 		game.getTableHeader().setUI(null);
 		game.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	}
+		
 	
-	void FillContentMainMatrix() {
+	void FillContentMainMatrix() throws SQLException {
 		int sizeX = mat.sumOfCombinations(attack.size()) + 1;
-		int sizeY = mat.sumOfCombinations(defense.size()) + 1;
+		int sizeY = strategiesDefense.size() + 1;
 		String[] defenderNames = new String[sizeY];
 		String[] attackerNames = new String[sizeX];
 		meansGame = new String[sizeX][sizeY];
@@ -218,12 +246,21 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		fillMeansGame();
 	}
 	
-	void fillMeansGame() {
+	void fillMeansGame() throws SQLException {
 		int i = 0;
 		int j = 0;
 		int tempSize = 0;
 		String[] temp;
 		String[] tempAt;
+		HashSet<Pair<String, String>> defendAgainst = new HashSet<>();
+		String[][] defAgainst = Database.getInstance().getTable("defend_against", 3);
+		//fill defenedAgaints of mysqlDb
+		for(int k = 0; k < defAgainst.length; k++) {
+			defendAgainst.add(new Pair<String, String>(defAgainst[k][1], defAgainst[k][2]));
+		}
+		System.out.println(defendAgainst.toString());
+		//protect exist for storage data about attacks that not realize for strategy
+		HashSet<Integer> protect = new HashSet<Integer>();
 		for(ArrayList<String> at:strategiesAttack) {
 			i++;
 			for(ArrayList<String> def:strategiesDefense) {
@@ -231,13 +268,16 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 				int sum = 0;
 				temp = def.get(0).split(" ");
 				tempAt = at.get(0).split(" ");
-				for(int d = 0; d < temp.length; d++) {
+				for (int d = 0; d < temp.length; d++) {
 					sum += Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[2]);
+					for (int a = 0; a < tempAt.length; a++) {
+						System.out.println(defendAgainst.contains(new Pair<String, String> ("1","2")));
+						if (defendAgainst.contains(new Pair<String,String>(temp[d], attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0]))) {
+						//if (defendAgainst.containsKey(temp[d]) && defendAgainst.get(temp[d]).equals(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0])) {
+							protect.add(Integer.parseInt(tempAt[a]) - 1);
+						}
+					}
 					//sum += Integer.parseInt(priceDefense[Character.getNumericValue(def.get(0).charAt(d)) - 1]);
-				}
-				for(int a = 0; a < tempAt.length; a++) {
-					sum += Integer.parseInt(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[2]);
-					//sum += Integer.parseInt(priceAttack[Character.getNumericValue(at.get(0).charAt(a)) - 1]);
 				}
 				/*
 				for(int d = 0; d < def.get(0).length(); d++) {
@@ -249,6 +289,12 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 					//sum += Integer.parseInt(priceAttack[Character.getNumericValue(at.get(0).charAt(a)) - 1]);
 				}
 				*/
+				for (int a = 0; a < tempAt.length; a++) {
+					if(!protect.contains(Integer.parseInt(tempAt[a]) - 1)) {
+						sum += Integer.parseInt(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[2]);
+					}
+				}
+				protect = new HashSet<Integer>();
 				meansGame[i][j] = Integer.toString(sum);
 			}
 			j = 0;
@@ -301,8 +347,9 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	{
         info.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+            	System.out.println(optimal);
+            	String[][] info = null;
             	String[] Defend = {"¹", "unicname","cost","info","unicgroup"};
-            	String[][] info = new String[optimal.length()][Defend.length];
             	int counter = 0;
             	int i = 0;
             	int j = 0;
@@ -311,12 +358,15 @@ public class GameTable extends BaseFrame implements InterfaceObject{
             		if(Integer.toString(i).equals(optimal)) {
             			String[] temp;
             			temp = def.get(0).split(" ");
+            			info = new String[temp.length][Defend.length];
             			for(int k = 0; k < temp.length; k++) {
             			for(Strategy strategy:defense) {
                         		j++;
                         		if (temp[k].equals(Integer.toString(j))) {
-                        				info[counter] = strategy.getStrategy();
-                        				counter++;
+                        			for(int t = 0; t < Defend.length; t++) {
+                        				info[counter][t] = strategy.getStrategy()[t];
+                        			}
+                        			counter++;
                         		}
             			}
             			j = 0;
