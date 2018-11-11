@@ -42,7 +42,6 @@ public String[] getFieldFromTable(String tableName, String name) throws SQLExcep
  		int j = 0;
  		while(resultSet.next()) {
  			array[j] = resultSet.getString(1);
- 			System.out.println(array[j]);
  			j++;
  		}
  	}
@@ -119,7 +118,6 @@ public String[][] getTable(String tableName, int columnNumber) throws SQLExcepti
      		resultSet = statement.executeQuery(request);
      		while(resultSet.next()) {
      			for(int i = 1; i <= columnNumber; i++) {
-     				System.out.println(resultSet.getString(i));
      				array[j][i-1] = resultSet.getString(i);
      			}
      			j++;

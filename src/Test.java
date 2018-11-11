@@ -7,6 +7,5 @@ public class Test {
 		String[] names = {"unicname", "damage", "info", "unicgroup"};
 		String[] result = Database.getInstance().getFieldFromTable("attacks", "unicname");
 		//String[][] result = Database.getInstance().getTable("attacks", 4);
-		System.out.println(result);
 	}
 }

@@ -122,8 +122,6 @@ public class AddTable extends BaseFrame implements InterfaceObject{
         save.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             		String[][] tempArray = new String[table1.getRowCount()][table1.getColumnCount()];
-            		System.out.println(name);
-            		System.out.println(columnsHeader.length);
 					Database.getInstance().clearTable(name);
 					for(int i = 0; i < table1.getRowCount(); i++) {
 						for(int j = 0; j < table1.getColumnCount(); j++) {

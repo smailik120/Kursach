@@ -27,6 +27,8 @@ import java.util.TreeSet;
 import java.awt.event.ActionEvent;
 public class GameTable extends BaseFrame implements InterfaceObject{
 	private String name;
+	private String probs[][];
+	private String viewProb[][];
 	private String [][] meansAttack;
 	private String [][] meansDefense;
 	private JButton info;
@@ -86,10 +88,12 @@ public class GameTable extends BaseFrame implements InterfaceObject{
   		String nameForChooseTableDefense[] = {"№", "defense name", "Choose"};
   		meansDefense = new String[FieldDefense.length][3];
   		String[] headerProb = {"Вероятности"};
-  		prob =  new String[mat.sumOfCombinations(FieldAttack.length)][1];
-  		for(int i = 0; i < prob.length; i++)
+  		prob =  new String[mat.sumOfCombinations(Database.getInstance().getSize("attacks"))][1];
+  		probs = Database.getInstance().getTable("prob", 2);
+  		viewProb = new String[probs.length][1];
+  		for(int k = 0; k < viewProb.length; k++)
   		{
-  			prob[i][0] = "0.5";
+  			viewProb[k][0] = probs[k][1];
   		}
   		String[][] container = Database.getInstance().getTable("defense", 5);
   		/*
@@ -117,7 +121,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		*/
   		String[] nameForGameTable = {"Таблица в которой отображаются все стратегии"};
 		chooseAttack = buildCheckTable(nameForChooseTableAttack, meansAttack, FieldAttack);
-		JTable probabilities = new JTable(prob, headerProb);
+		JTable probabilities = new JTable(viewProb, headerProb);
 		game = new JTable(meansGame, nameForGameTable);
   		chooseDefense = buildCheckTable(nameForChooseTableDefense, meansDefense, FieldDefense);
 		Box contents = new Box(BoxLayout.X_AXIS);
@@ -207,7 +211,6 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 				for(int j = 0; j < temp.length; j++) {
 					if(compability.contains(new Pair<String, String> (defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0], defense.get(Integer.parseInt(temp[j]) - 1).getStrategy()[0]))) {
 					//if(compability.containsKey(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]) && defense.get(Integer.parseInt(temp[j]) - 1).getStrategy()[0].equals(compability.get(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]))) {
-						System.out.println("keyyy"+ temp[j]);
 						prov++;
 					}
 			}
@@ -258,9 +261,20 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		for(int k = 0; k < defAgainst.length; k++) {
 			defendAgainst.add(new Pair<String, String>(defAgainst[k][1], defAgainst[k][2]));
 		}
-		System.out.println(defendAgainst.toString());
+		for(int k = 0; k < prob.length; k++) {
+			prob[k][0] = "1.0";
+		}
+		double luck = 0;
 		//protect exist for storage data about attacks that not realize for strategy
 		HashSet<Integer> protect = new HashSet<Integer>();
+		for(ArrayList<String> at:strategiesAttack) {
+			i++;
+			tempAt = at.get(0).split(" ");
+			for (int a = 0; a < tempAt.length; a++) {
+	  			prob[i - 1][0] = Double.toString(Double.parseDouble((prob[i - 1][0])) * Double.parseDouble(probs[Integer.parseInt(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0]) - 1][1]));
+			}
+		}
+		i = 0;
 		for(ArrayList<String> at:strategiesAttack) {
 			i++;
 			for(ArrayList<String> def:strategiesDefense) {
@@ -271,7 +285,6 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 				for (int d = 0; d < temp.length; d++) {
 					sum += Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[2]);
 					for (int a = 0; a < tempAt.length; a++) {
-						System.out.println(defendAgainst.contains(new Pair<String, String> ("1","2")));
 						if (defendAgainst.contains(new Pair<String,String>(temp[d], attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0]))) {
 						//if (defendAgainst.containsKey(temp[d]) && defendAgainst.get(temp[d]).equals(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0])) {
 							protect.add(Integer.parseInt(tempAt[a]) - 1);
@@ -324,12 +337,25 @@ public class GameTable extends BaseFrame implements InterfaceObject{
             public void actionPerformed(ActionEvent e) {
             		optimal = Integer.toString(matrix.getSeddlePoint());
 					message.setText("result with minimax: Defender" + Integer.toString(matrix.getSeddlePoint()));
-					infoButton();
+					for(ArrayList<String> def:strategiesDefense) {
+						System.out.println(def.toString());
+					}
             }
         });
         buttons.add(seddle);
 	}
 	
+	void createMonteButton() 
+	{
+		JButton monte = new JButton("Monte");
+        monte.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            		optimal = Integer.toString(matrix.getMonte(50000));
+					message.setText("result with minimax: Defender" + Integer.toString(matrix.getMonte(50000)));
+            }
+        });
+        buttons.add(monte);
+	}
 	void createBaesButton() 
 	{
 		JButton baes = new JButton("Baes");
@@ -337,7 +363,6 @@ public class GameTable extends BaseFrame implements InterfaceObject{
             public void actionPerformed(ActionEvent e) {
             		optimal = Integer.toString(matrix.getBaes(prob));
 					message.setText("result with baes: Defender" + Integer.toString(matrix.getBaes(prob)));
-					infoButton();
             }
         });
         buttons.add(baes);
@@ -347,12 +372,12 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	{
         info.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	System.out.println(optimal);
             	String[][] info = null;
             	String[] Defend = {"№", "unicname","cost","info","unicgroup"};
             	int counter = 0;
             	int i = 0;
             	int j = 0;
+            	System.out.println("optimal" + optimal);
             	for(ArrayList<String> def:strategiesDefense) {
             		i++;
             		if(Integer.toString(i).equals(optimal)) {
@@ -411,7 +436,9 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		createButton();
 		createSeddleButton();
 		createBaesButton();
+		createMonteButton();
 		createMessageError();
+		infoButton();
 		getContentPane().add(buttons, "North");
 	}
 	

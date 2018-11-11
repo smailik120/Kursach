@@ -107,7 +107,6 @@ public class StringWorker implements Work{
 			}
 		}
 		*/
-		System.out.println(result.toString());
 		return result;
 	}
 }
