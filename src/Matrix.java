@@ -1,8 +1,17 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Scanner;
 
 public class Matrix {
 	private String[][] array;
-	public Matrix(String[][] array) {
+	private int money;
+	public Matrix(String[][] array) throws IOException {
 		this.array = array;
+		this.money = money;
 	}
 	
 	public int getIndexForMin(Double[] arr) {
@@ -40,6 +49,7 @@ public class Matrix {
 					max = Integer.parseInt(array[j][i]);
 				}
 			}
+			System.out.println(max);
 			if(max <= min) {
 				min = max;
 				result = i;
@@ -109,9 +119,40 @@ public class Matrix {
 		}
 		for(int i = 0; i < step.length - 1; i++) {
 			meanOnStep[i + 1] = meanOnStep[i+1] *  (1.0/step[i + 1]);
-			System.out.println(meanOnStep[i+1]);
 		}
 		return getIndexForMin(meanOnStep);
 	}
 	
+	public int getTomphson() throws IOException {
+		try {
+			test();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		FileReader reader = new FileReader("C:\\test\\python.txt");
+		Scanner scan = new Scanner(reader);
+		int res = scan.nextInt();
+		System.out.println(res);
+		reader.close();
+		return res;
+	}
+	
+	public void test() throws IOException, InterruptedException {
+		InputStream is = Runtime.getRuntime().exec(new String[] {"c:/test/start.bat"}).getInputStream();
+        int i;
+        while((i = is.read()) != -1)
+        {
+        }
+		//Runtime.getRuntime().exec(new String[] {"cmd.exe", "/C","C:/test/start.bat"});
+		//ProcessBuilder processBuilder = new ProcessBuilder("C:/test/start.bat");
+		//Runtime rt = Runtime.getRuntime();
+		//Process p = rt.exec("python C:/test/Thompson.py");
+		//Thread.sleep(1000);
+        //p.destroy();
+		//processBuilder.start();
+		
+		//processBuilder.redirectErrorStream();
+        System.out.println("Process destroyed");
+       }
 }

@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -31,8 +33,15 @@ public class MainFrame {
 	/**
 	 * Launch the application.
 	 * @throws SQLException 
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws SQLException {
+	public static void main(String[] args) throws SQLException, IOException {
+		InputStream is = Runtime.getRuntime().exec(new String[] {"C:\\test\\ozu.bat"}).getInputStream();
+	    int i;
+	    while((i = is.read()) != -1)
+	    {
+	    }
+	    is.close();
 		BaseFrame frame = new BaseFrame(300,300,300,300);
 		JButton attack = new JButton("Attacks");
 		attack.setBounds(44, 36, 200, 50);

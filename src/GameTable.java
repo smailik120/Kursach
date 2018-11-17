@@ -1,3 +1,4 @@
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import javax.swing.JFrame;
@@ -16,6 +17,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -23,6 +29,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.TreeSet;
 import java.awt.event.ActionEvent;
 public class GameTable extends BaseFrame implements InterfaceObject{
@@ -41,7 +48,10 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	private ArrayList<Strategy> defense;
 	private ArrayList<Strategy> attack;
 	private String[][] meansGame;
+	private String[][] meanOzu;
 	private JTable tableAttacks;
+	private JTextField cost;
+	private JTextField ozu;
 	private JTable probabilities;
 	private JTable chooseDefense;
 	private JTable chooseAttack;
@@ -58,7 +68,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	private DefaultTableModel tableModel;
 	private Box buttons;
 	private JLabel message;
-	public GameTable(int coordinateX,int coordinateY,int sizeX,int sizeY, String name) throws SQLException
+	public GameTable(int coordinateX,int coordinateY,int sizeX,int sizeY, String name) throws SQLException, IOException
 	{
 		super(coordinateX, coordinateY, sizeX, sizeY);
 		this.worker = new StringWorker();
@@ -79,7 +89,12 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        createPanel();
+        try {
+			createPanel();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void init() throws SQLException {
@@ -88,8 +103,10 @@ public class GameTable extends BaseFrame implements InterfaceObject{
   		String nameForChooseTableDefense[] = {"№", "defense name", "Choose"};
   		meansDefense = new String[FieldDefense.length][3];
   		String[] headerProb = {"Вероятности"};
-  		prob =  new String[mat.sumOfCombinations(Database.getInstance().getSize("attacks"))][1];
+  		prob =  new String[1000000][1];
+  		System.out.println("size" + prob.length);
   		probs = Database.getInstance().getTable("prob", 2);
+  		meanOzu = Database.getInstance().getTable("ozu", 3);
   		viewProb = new String[probs.length][1];
   		for(int k = 0; k < viewProb.length; k++)
   		{
@@ -124,11 +141,12 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		JTable probabilities = new JTable(viewProb, headerProb);
 		game = new JTable(meansGame, nameForGameTable);
   		chooseDefense = buildCheckTable(nameForChooseTableDefense, meansDefense, FieldDefense);
+  		chooseAttack.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		Box contents = new Box(BoxLayout.X_AXIS);
-        contents.add(new JScrollPane(chooseAttack));
+        contents.add(new JScrollPane(chooseAttack, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
         contents.add(new JScrollPane(probabilities, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
         contents.add(new JScrollPane(game, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
-        contents.add(new JScrollPane(chooseDefense));
+        contents.add(new JScrollPane(chooseDefense, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS));
         setContentPane(contents);
 	}
 	void build() throws SQLException {
@@ -149,12 +167,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		return new JTable(modelGame);
 	}
 	
-	public void buildGameTable() throws SQLException {
+	public void buildGameTable() throws SQLException, NumberFormatException, IOException {
 		defense = new ArrayList<Strategy>();
 		attack = new ArrayList<Strategy>();
 		int size = 0;
-		for(int i = 0; i < chooseDefense.getRowCount(); i++)
-		{
+		for(int i = 0; i < chooseDefense.getRowCount(); i++) {
 			if(chooseDefense.getValueAt(i, 2).equals(true)) {
 				size++;
 			}
@@ -203,11 +220,14 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 			compability.add(new Pair<String, String>(comp[i][1], comp[i][2]));
 		}
 		int prov = 0;
+		int sum = 0;
 		//delete not compability
 		for(ArrayList<String> def:strategiesDefense) {
 			prov = 0;
 			String[] temp = def.get(0).split(" ");
+			//System.out.println(meanOzu[Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0])]);
 			for(int d = 0; d < temp.length; d++) {
+				sum = sum + Integer.parseInt(meanOzu[Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]) - 1][2]);
 				for(int j = 0; j < temp.length; j++) {
 					if(compability.contains(new Pair<String, String> (defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0], defense.get(Integer.parseInt(temp[j]) - 1).getStrategy()[0]))) {
 					//if(compability.containsKey(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]) && defense.get(Integer.parseInt(temp[j]) - 1).getStrategy()[0].equals(compability.get(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]))) {
@@ -215,6 +235,10 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 					}
 			}
 			}
+			if(sum > Integer.parseInt(ozu.getText())) {
+				array.add(def);
+			}
+			sum = 0;
 			if(prov > 0) {
 				array.add(def);
 			}
@@ -230,9 +254,10 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	}
 		
 	
-	void FillContentMainMatrix() throws SQLException {
+	void FillContentMainMatrix() throws SQLException, NumberFormatException, IOException {
 		int sizeX = mat.sumOfCombinations(attack.size()) + 1;
 		int sizeY = strategiesDefense.size() + 1;
+		System.out.println(sizeX + " " + sizeY + " " + attack.size());
 		String[] defenderNames = new String[sizeY];
 		String[] attackerNames = new String[sizeX];
 		meansGame = new String[sizeX][sizeY];
@@ -249,7 +274,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		fillMeansGame();
 	}
 	
-	void fillMeansGame() throws SQLException {
+	void fillMeansGame() throws SQLException, NumberFormatException, IOException {
 		int i = 0;
 		int j = 0;
 		int tempSize = 0;
@@ -313,8 +338,18 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 			j = 0;
 		}
 		matrix = new Matrix(meansGame);
+		FileWriter writer = new FileWriter("C:\\test\\java.txt");
+		for(int k = 1;k < meansGame.length;k++) {
+			for(int k1 = 1;k1 < meansGame[0].length;k1++) {
+				writer.write(meansGame[k][k1]);
+				writer.write(' ');
+			}
+			writer.write('\r');
+			writer.write('\n');
+		}
+		writer.close();
 	}
-	void createButton() 
+	void createButton() throws IOException 
 	{
 		JButton create = new JButton("Create Game");
         create.addActionListener(new ActionListener() {
@@ -324,10 +359,51 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
             }
         });
         buttons.add(create);
+	}
+	
+	
+	void createFieldCost() {
+		JLabel label = new JLabel();
+		label.setText("how much money you want give");
+		cost = new JTextField("0");
+		buttons.add(label);
+		buttons.add(cost);
+	}
+	
+	void createFieldOzu() throws IOException, InterruptedException {
+		final int size = 25;
+		JLabel label = new JLabel();
+		label.setText("enter your ozu");
+		FileReader reader = new FileReader("C:/test/ozu.txt");
+		Scanner sc = new Scanner(reader);
+		int index = 0;
+		String res = "";
+		while(sc.hasNext()) {
+			String t = sc.nextLine();
+			index++;
+			if(index == size) {
+				for(int i = 0; i < t.length(); i++) {
+					if(t.charAt(i) >= 48 && t.charAt(i)<=57) {
+						res = res + t.charAt(i);
+					}
+				}
+				break;
+			}
+		}
+		reader.close();
+		ozu = new JTextField(res);
+		buttons.add(label);
+		buttons.add(ozu);
 	}
 	
 	void createSeddleButton() 
@@ -338,7 +414,6 @@ public class GameTable extends BaseFrame implements InterfaceObject{
             		optimal = Integer.toString(matrix.getSeddlePoint());
 					message.setText("result with minimax: Defender" + Integer.toString(matrix.getSeddlePoint()));
 					for(ArrayList<String> def:strategiesDefense) {
-						System.out.println(def.toString());
 					}
             }
         });
@@ -351,11 +426,29 @@ public class GameTable extends BaseFrame implements InterfaceObject{
         monte.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             		optimal = Integer.toString(matrix.getMonte(50000));
-					message.setText("result with minimax: Defender" + Integer.toString(matrix.getMonte(50000)));
+					message.setText("result with monte: Defender" + optimal);
             }
         });
         buttons.add(monte);
 	}
+	
+	void createThompsonButton() 
+	{
+		JButton monte = new JButton("Thompson");
+        monte.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            		try {
+						optimal = Integer.toString(matrix.getTomphson());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					message.setText("result with thompson: Defender" + optimal);
+            }
+        });
+        buttons.add(monte);
+	}
+	
 	void createBaesButton() 
 	{
 		JButton baes = new JButton("Baes");
@@ -377,7 +470,6 @@ public class GameTable extends BaseFrame implements InterfaceObject{
             	int counter = 0;
             	int i = 0;
             	int j = 0;
-            	System.out.println("optimal" + optimal);
             	for(ArrayList<String> def:strategiesDefense) {
             		i++;
             		if(Integer.toString(i).equals(optimal)) {
@@ -430,13 +522,20 @@ public class GameTable extends BaseFrame implements InterfaceObject{
         buttons.add(info);
 	}
 	
-	public void createPanel() 
+	public void createPanel() throws IOException 
 	{
 		buttons = new Box(BoxLayout.Y_AXIS);
+		try {
+			createFieldOzu();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		createButton();
 		createSeddleButton();
 		createBaesButton();
 		createMonteButton();
+		createThompsonButton();
 		createMessageError();
 		infoButton();
 		getContentPane().add(buttons, "North");
