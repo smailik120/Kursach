@@ -40,11 +40,11 @@ for i in range(1,50000):
         if average[k] < min:
             min = average[k]
     mean[ind] = mean[ind] + int(matrix[attack][ind])
+    step[ind] = step[ind] + 1;
     if (average[ind] == min):
-        t = bernoulli.rvm(theta[ind])
+        t = bernoulli.rvs(theta[ind])
         a[ind] = a[ind] + t
-        step[ind] = step[ind] + 1;
-        b[ind] = b[ind] + 1
+        b[ind] = b[ind] + 1 - t
 min = 10000000;
 print(average)
 print(theta)

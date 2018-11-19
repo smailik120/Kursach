@@ -49,9 +49,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	private ArrayList<Strategy> attack;
 	private String[][] meansGame;
 	private String[][] meanOzu;
+	private String[][] meanBit;
 	private JTable tableAttacks;
 	private JTextField cost;
 	private JTextField ozu;
+	private JTextField bitDepth;
 	private JTable probabilities;
 	private JTable chooseDefense;
 	private JTable chooseAttack;
@@ -107,6 +109,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
   		System.out.println("size" + prob.length);
   		probs = Database.getInstance().getTable("prob", 2);
   		meanOzu = Database.getInstance().getTable("ozu", 3);
+  		meanBit = Database.getInstance().getTable("bit_depth", 3);
   		viewProb = new String[probs.length][1];
   		for(int k = 0; k < viewProb.length; k++)
   		{
@@ -221,12 +224,22 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		}
 		int prov = 0;
 		int sum = 0;
+		int bit = 0;
 		//delete not compability
 		for(ArrayList<String> def:strategiesDefense) {
 			prov = 0;
 			String[] temp = def.get(0).split(" ");
 			//System.out.println(meanOzu[Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0])]);
 			for(int d = 0; d < temp.length; d++) {
+				for(int b = 0; b < meanBit.length; b++) {
+					if(meanBit[Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]) - 1][0].equals(meanBit[b][0])) {
+						if(meanBit[b][1].equals(bitDepth.getText())) {
+							bit++;
+							break;
+						}
+				}
+				}
+				System.out.println("bit" + bit);
 				sum = sum + Integer.parseInt(meanOzu[Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0]) - 1][2]);
 				for(int j = 0; j < temp.length; j++) {
 					if(compability.contains(new Pair<String, String> (defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0], defense.get(Integer.parseInt(temp[j]) - 1).getStrategy()[0]))) {
@@ -235,10 +248,15 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 					}
 			}
 			}
+			if(bit != temp.length) {
+				array.add(def);
+			}
+			bit = 0;
 			if(sum > Integer.parseInt(ozu.getText())) {
 				array.add(def);
 			}
 			sum = 0;
+			bit = 0;
 			if(prov > 0) {
 				array.add(def);
 			}
@@ -378,6 +396,32 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		cost = new JTextField("0");
 		buttons.add(label);
 		buttons.add(cost);
+	}
+	
+	void createFieldBitDepth() throws IOException {
+		JLabel label = new JLabel();
+		label.setText("bit depth your system");
+		final int size = 15;
+		FileReader reader = new FileReader("src//ozu.txt");
+		Scanner sc = new Scanner(reader);
+		int index = 0;
+		String res = "";
+		while(sc.hasNext()) {
+			String t = sc.nextLine();
+			index++;
+			if(index == size) {
+				for(int i = 0; i < t.length(); i++) {
+					if(t.charAt(i) >= 48 && t.charAt(i)<=57) {
+						res = res + t.charAt(i);
+					}
+				}
+				break;
+			}
+		}
+		reader.close();
+		bitDepth = new JTextField(res);
+		buttons.add(label);
+		buttons.add(bitDepth);
 	}
 	
 	void createFieldOzu() throws IOException, InterruptedException {
@@ -525,6 +569,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	public void createPanel() throws IOException 
 	{
 		buttons = new Box(BoxLayout.Y_AXIS);
+		createFieldBitDepth();
 		try {
 			createFieldOzu();
 		} catch (InterruptedException e) {
