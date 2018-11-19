@@ -1,1 +1,0 @@
-python C:\\Users\\stas\\PycharmProjects\\untitled\\Thompson.py

@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import re
-f = open('C:\\test\\java.txt','r');
+from scipy.stats import bernoulli
+f = open('src//java.txt','r');
 rows = 0;
 columns = 0;
 matrix = [];
@@ -39,15 +40,15 @@ for i in range(1,50000):
         if average[k] < min:
             min = average[k]
     mean[ind] = mean[ind] + int(matrix[attack][ind])
+    step[ind] = step[ind] + 1;
     if (average[ind] == min):
-        a[ind] = a[ind] + 0.01
-        step[ind] = step[ind] + 1;
-    else:
-        b[ind] = b[ind] + 0.01
+        t = bernoulli.rvs(theta[ind])
+        a[ind] = a[ind] + t
+        b[ind] = b[ind] + 1 - t
 min = 10000000;
 print(average)
 print(theta)
 print(ind + 1)
-f = open('C:\\test\\python.txt','w');
+f = open('src//python.txt','w');
 f.write(str(ind + 1))
 f.close()

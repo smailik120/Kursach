@@ -338,7 +338,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 			j = 0;
 		}
 		matrix = new Matrix(meansGame);
-		FileWriter writer = new FileWriter("C:\\test\\java.txt");
+		FileWriter writer = new FileWriter("src//java.txt");
 		for(int k = 1;k < meansGame.length;k++) {
 			for(int k1 = 1;k1 < meansGame[0].length;k1++) {
 				writer.write(meansGame[k][k1]);
@@ -384,7 +384,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		final int size = 25;
 		JLabel label = new JLabel();
 		label.setText("enter your ozu");
-		FileReader reader = new FileReader("C:/test/ozu.txt");
+		FileReader reader = new FileReader("src//ozu.txt");
 		Scanner sc = new Scanner(reader);
 		int index = 0;
 		String res = "";

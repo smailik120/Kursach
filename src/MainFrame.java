@@ -36,7 +36,7 @@ public class MainFrame {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws SQLException, IOException {
-		InputStream is = Runtime.getRuntime().exec(new String[] {"C:\\test\\ozu.bat"}).getInputStream();
+		InputStream is = Runtime.getRuntime().exec(new String[] {"src//ozu.bat"}).getInputStream();
 	    int i;
 	    while((i = is.read()) != -1)
 	    {

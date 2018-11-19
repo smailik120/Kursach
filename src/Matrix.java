@@ -130,7 +130,7 @@ public class Matrix {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		FileReader reader = new FileReader("C:\\test\\python.txt");
+		FileReader reader = new FileReader("src//python.txt");
 		Scanner scan = new Scanner(reader);
 		int res = scan.nextInt();
 		System.out.println(res);
@@ -139,11 +139,12 @@ public class Matrix {
 	}
 	
 	public void test() throws IOException, InterruptedException {
-		InputStream is = Runtime.getRuntime().exec(new String[] {"c:/test/start.bat"}).getInputStream();
+		InputStream is = Runtime.getRuntime().exec(new String[] {"python","src//Thompson.py"}).getInputStream();
         int i;
         while((i = is.read()) != -1)
         {
         }
+        is.close();
 		//Runtime.getRuntime().exec(new String[] {"cmd.exe", "/C","C:/test/start.bat"});
 		//ProcessBuilder processBuilder = new ProcessBuilder("C:/test/start.bat");
 		//Runtime rt = Runtime.getRuntime();
@@ -153,6 +154,6 @@ public class Matrix {
 		//processBuilder.start();
 		
 		//processBuilder.redirectErrorStream();
-        System.out.println("Process destroyed");
+        System.out.println("Process destroyed bat");
        }
 }
