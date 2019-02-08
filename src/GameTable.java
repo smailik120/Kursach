@@ -325,12 +325,15 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 				int sum = 0;
 				temp = def.get(0).split(" ");
 				tempAt = at.get(0).split(" ");
+				System.out.println(temp);
 				for (int d = 0; d < temp.length; d++) {
 					sum += Integer.parseInt(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[2]);
+					
 					for (int a = 0; a < tempAt.length; a++) {
-						if (defendAgainst.contains(new Pair<String,String>(temp[d], attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0]))) {
+						if (defendAgainst.contains(new Pair<String,String>(defense.get(Integer.parseInt(temp[d]) - 1).getStrategy()[0], attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0]))) {
 						//if (defendAgainst.containsKey(temp[d]) && defendAgainst.get(temp[d]).equals(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[0])) {
 							protect.add(Integer.parseInt(tempAt[a]) - 1);
+							System.out.println();
 						}
 					}
 					//sum += Integer.parseInt(priceDefense[Character.getNumericValue(def.get(0).charAt(d)) - 1]);
