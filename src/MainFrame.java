@@ -52,12 +52,12 @@ public class MainFrame {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		String nameTableAttacks = "attacks";
-        String[] columnsHeaderAttacks = {"№", "unicname", "damage"};
+        String[] columnsHeaderAttacks = {"№", "Название", "Цена пропущенной атаки"};
         String[][] arrayAttacks = Database.getInstance().getTable(nameTableAttacks, columnsHeaderAttacks.length);
  		AddTable tableAttacks = new AddTable(100, 100, 800, 800, arrayAttacks, columnsHeaderAttacks,nameTableAttacks);
  		String nameTableDefense = "defense";
-        String[] columnsHeaderDefense = {"№", "unicname", "cost", "info", "unicgroup"};
-        String[] namesDefense = {"№", "unicname", "cost", "info", "unicgroup", "ozu", "bitDepth"};
+        String[] columnsHeaderDefense = {"№", "Название", "стоимость", "Дата", "Тип"};
+        String[] namesDefense = {"№", "Название", "стоимость", "Дата", "Тип", "озу", "битность"};
         String[][] arrayDefense = Database.getInstance().getTable(nameTableDefense, columnsHeaderDefense.length);
         String[][] ozu = Database.getInstance().getTable("ozu", 3);
         String[][] bitDepth = Database.getInstance().getTable("bit_depth", 3);

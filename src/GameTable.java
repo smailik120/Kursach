@@ -78,7 +78,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 		this.mat = new Mathematics();
 		this.name = name;
 		this.map = new HashMap<String, ArrayList<Integer>>();
-		this.info = new JButton("Info");
+		this.info = new JButton("Информация о лучшей стратегии");
 		build();
         CreateFrame();
 	}
@@ -101,11 +101,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	}
 	
 	public void init() throws SQLException {
-		String nameForChooseTableAttack[] = {"№", "attack name", "Choose"};
+		String nameForChooseTableAttack[] = {"№", "Название", "Выбор"};
   		meansAttack = new String[FieldAttack.length][3];
-  		String nameForChooseTableDefense[] = {"№", "defense name", "Choose"};
+  		String nameForChooseTableDefense[] = {"№", "Название", "Выбор"};
   		meansDefense = new String[FieldDefense.length][3];
-  		String[] headerProb = {"Probability"};
+  		String[] headerProb = {"Вероятности"};
   		prob =  new String[1000000][1];
   		System.out.println("size" + prob.length);
   		probs = Database.getInstance().getTable("prob", 2);
@@ -140,7 +140,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 			attack.add(strategy);
 		}
 		*/
-  		String[] nameForGameTable = {"Matrix game"};
+  		String[] nameForGameTable = {"Игра"};
 		chooseAttack = buildCheckTable(nameForChooseTableAttack, meansAttack, FieldAttack);
 		JTable probabilities = new JTable(viewProb, headerProb);
 		game = new JTable(meansGame, nameForGameTable);
@@ -373,7 +373,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	}
 	void createButton() throws IOException 
 	{
-		JButton create = new JButton("Create Game");
+		JButton create = new JButton("Создать игру");
         create.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	try {
@@ -404,14 +404,14 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	
 	void createFieldGurvic() throws IOException {
 		JLabel label = new JLabel();
-		label.setText("Коэффицент с дял критерия Гурвица");
+		label.setText("Коэффицент с для критерия Гурвица");
 		buttons.add(label);
 		buttons.add(c);
 	}
 	
 	void createFieldBitDepth() throws IOException {
 		JLabel label = new JLabel();
-		label.setText("bit depth your system");
+		label.setText("битность твоей системы");
 		final int size = 15;
 		FileReader reader = new FileReader("src//ozu.txt");
 		Scanner sc = new Scanner(reader);
@@ -438,7 +438,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	void createFieldOzu() throws IOException, InterruptedException {
 		final int size = 25;
 		JLabel label = new JLabel();
-		label.setText("enter your ozu");
+		label.setText("оперативная память твоей системы");
 		FileReader reader = new FileReader("src//ozu.txt");
 		Scanner sc = new Scanner(reader);
 		int index = 0;
@@ -463,11 +463,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	
 	void createSeddleButton() 
 	{
-		JButton seddle = new JButton("Minimax");
+		JButton seddle = new JButton("Севидж");
         seddle.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             		optimal = Integer.toString(matrix.getSeddlePoint());
-					message.setText("result with minimax: Defender" + Integer.toString(matrix.getSeddlePoint()));
+            		message.setText("Результат по Севиджу: Защитное средство №" + optimal);
 					for(ArrayList<String> def:strategiesDefense) {
 					}
             }
@@ -478,11 +478,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	
 	void createMonteButton() 
 	{
-		JButton monte = new JButton("Monte");
+		JButton monte = new JButton("Монте Карло");
         monte.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             		optimal = Integer.toString(matrix.getMonte(50000));
-					message.setText("result with monte: Defender" + optimal);
+            		message.setText("Результат по Монте Карло: Защитное средство №" + optimal);
             }
         });
         buttons.add(monte);
@@ -490,11 +490,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	
 	void createGurvicButton() 
 	{
-		JButton gurvic = new JButton("Гурвиц");
+		JButton gurvic = new JButton("Критерий Гурвица");
         gurvic.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             		optimal = Integer.toString(matrix.getGurvic(Double.parseDouble(c.getText())));
-					message.setText("result with Гурвиц: Defender" + optimal);
+					message.setText("Результат по Гурвицу: Защитное средство №" + optimal);
             }
         });
         buttons.add(gurvic);
@@ -502,11 +502,11 @@ public class GameTable extends BaseFrame implements InterfaceObject{
 	
 	void createBaesButton() 
 	{
-		JButton baes = new JButton("Baes");
+		JButton baes = new JButton("Байес");
         baes.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             		optimal = Integer.toString(matrix.getBaes(prob));
-					message.setText("result with baes: Defender" + Integer.toString(matrix.getBaes(prob)));
+            		message.setText("Результат по Байесу: Защитное средство №" + optimal);
             }
         });
         buttons.add(baes);
@@ -517,7 +517,7 @@ public class GameTable extends BaseFrame implements InterfaceObject{
         info.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	String[][] info = null;
-            	String[] Defend = {"№", "unicname","cost","info","unicgroup", "ozu", "bitDepth"};
+            	String[] Defend = {"№", "Название","Стоимость","Дата","Тип", "озу", "битность"};
             	int counter = 0;
             	int i = 0;
             	int j = 0;
