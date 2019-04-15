@@ -52,13 +52,30 @@ public class MainFrame {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		String nameTableAttacks = "attacks";
-        String[] columnsHeaderAttacks = {"¹", "unicname", "damage", "info", "unicgroup"};
+        String[] columnsHeaderAttacks = {"¹", "unicname", "damage"};
         String[][] arrayAttacks = Database.getInstance().getTable(nameTableAttacks, columnsHeaderAttacks.length);
  		AddTable tableAttacks = new AddTable(100, 100, 800, 800, arrayAttacks, columnsHeaderAttacks,nameTableAttacks);
  		String nameTableDefense = "defense";
         String[] columnsHeaderDefense = {"¹", "unicname", "cost", "info", "unicgroup"};
+        String[] namesDefense = {"¹", "unicname", "cost", "info", "unicgroup", "ozu", "bitDepth"};
         String[][] arrayDefense = Database.getInstance().getTable(nameTableDefense, columnsHeaderDefense.length);
-  		AddTable tableDefense = new AddTable(100, 100, 800, 800, arrayDefense, columnsHeaderDefense,nameTableDefense);
+        String[][] ozu = Database.getInstance().getTable("ozu", 3);
+        String[][] bitDepth = Database.getInstance().getTable("bit_depth", 3);
+        String[][] resultDefense = new String[arrayDefense.length][columnsHeaderDefense.length + 2]; 
+        for(i = 0; i < arrayDefense.length; i++) {
+        	for(int j = 0; j < columnsHeaderDefense.length + 2; j++) {
+        		if(j < columnsHeaderDefense.length) {
+        			resultDefense[i][j] = arrayDefense[i][j];
+        		}
+        		if(j == columnsHeaderDefense.length) {
+        			resultDefense[i][j] = ozu[i][2];	
+        		}
+        		if(j == columnsHeaderDefense.length + 1) {
+        			resultDefense[i][j] = bitDepth[i][1];	
+        		}
+            }
+        }
+  		AddTable tableDefense = new AddTable(100, 100, 800, 800, resultDefense, namesDefense,nameTableDefense);
   		GameTable game = new GameTable(300,300,700,700,"game");
   		game.setVisible(true);
   		tableAttacks.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

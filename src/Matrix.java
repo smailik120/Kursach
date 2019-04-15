@@ -59,6 +59,39 @@ public class Matrix {
 		return result;
 	}
 	
+	public int getGurvic(double c) {
+		double result = 1000000;
+		int minIndex;
+		int maxIndex;
+		int min = -100000;
+		int max = 100000;
+		int resultIndex = 0;
+		double s[] = new double[array[0].length];
+		for(int i = 1; i < array[0].length; i++)
+		{
+			for(int j = 1; j < array.length; j++)
+			{
+				int current = Integer.parseInt(array[j][i]);
+				if(current >= min) {
+					min = current;
+					maxIndex = j;
+				}
+				if(current <= max) {
+					max = current;
+					minIndex = j;
+				}
+			}
+			s[i] = c*min + (1-c) * max;
+			if(s[i] <= result) {
+				result = s[i];
+				resultIndex = i;
+			}
+			min = -100000;
+			max = 100000;
+		}
+		return resultIndex;
+	}
+	
 	public int getBaes(String[][] probabilties) {
 		double min = 1000000;
 		int result = 0;
