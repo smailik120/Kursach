@@ -41,6 +41,7 @@ public class Matrix {
 		int min = 1000000;
 		int max = -min;
 		int result = 0;
+		int counter = 0;
 		for(int i = 1; i < array[0].length; i++)
 		{
 			for(int j = 1; j < array.length; j++)
@@ -61,8 +62,8 @@ public class Matrix {
 	
 	public int getGurvic(double c) {
 		double result = 1000000;
-		int minIndex;
-		int maxIndex;
+		int minIndex = 0;
+		int maxIndex = 0;
 		int min = -100000;
 		int max = 100000;
 		int resultIndex = 0;
@@ -94,6 +95,7 @@ public class Matrix {
 	
 	public int getBaes(String[][] probabilties) {
 		double min = 1000000;
+		int counter = 0;
 		int result = 0;
 		double sum = 0;
 		for(int i = 1; i < array[0].length; i++)
@@ -101,6 +103,7 @@ public class Matrix {
 			for(int j = 1; j < array.length; j++)
 			{
 				sum += Integer.parseInt(array[j][i]) * Double.parseDouble(probabilties[j - 1][0]);
+				System.out.println("prob" + probabilties[j-1][0]);
 			}
 			if(sum <= min) {
 				min = sum;

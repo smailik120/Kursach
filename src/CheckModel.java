@@ -15,12 +15,15 @@ public class CheckModel extends DefaultTableModel {
 		else if (columnIndex == 2) {
 			my = Boolean.class;
 		}
+		else if (columnIndex == 3) {
+			my = String.class;
+		}
 		return my;
 	}
 	
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		return column == 2 || column == 1 || column == 0;
+		return column == 2 || column == 1 || column == 0 || column == 3;
 	}
 	
 }
