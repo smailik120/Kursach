@@ -1,1 +1,1 @@
-python Thompson.py
+python tester.py

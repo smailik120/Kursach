@@ -440,7 +440,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 
 	void createFieldBitDepth() throws IOException {
 		JLabel label = new JLabel();
-		label.setText("битность");
+		label.setText("разрядность");
 		final int size = 15;
 		FileReader reader = new FileReader("src//ozu.txt");
 		Scanner sc = new Scanner(reader);
@@ -469,7 +469,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 	void createFieldOzu() throws IOException, InterruptedException {
 		final int size = 25;
 		JLabel label = new JLabel();
-		label.setText("Озу");
+		label.setText("ОЗУ");
 		FileReader reader = new FileReader("src//ozu.txt");
 		Scanner sc = new Scanner(reader);
 		int index = 0;
@@ -495,14 +495,14 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 	}
 
 	void createSeddleButton() {
-		JButton seddle = new JButton("Севидж");
+		JButton seddle = new JButton("Критерий Сэвиджа");
 		seddle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				long start = System.currentTimeMillis();
 				optimal = Integer.toString(matrix.getSeddlePoint());
-				message.setText("Результат по Севиджу:Сратегия №" + optimal);
+				message.setText("Результат по Сэвиджу:Сратегия №" + optimal);
 				time = System.currentTimeMillis() - start;
-				messageTime.setText("Время выполнения :" + 7 + "ms");
+				messageTime.setText("Время выполнения :" + time + "ms");
 				for (ArrayList<String> def : strategiesDefense) {
 				}
 			}
@@ -523,6 +523,25 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 		});
 		buttonsForGame.add(monte);
 	}
+	
+	void createThompsonButton() {
+		JButton monte = new JButton("Томпсон");
+		monte.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				long start = System.currentTimeMillis();
+				try {
+					optimal = Integer.toString(matrix.getTomphson());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				time = System.currentTimeMillis() - start;
+				message.setText("Результат по Томпсону:Сратегия №" + optimal);
+				messageTime.setText("Время выполнения :" + time + "ms");
+			}
+		});
+		buttonsForGame.add(monte);
+	}
 
 	void createGurvicButton() {
 		JButton gurvic = new JButton("Критерий Гурвица");
@@ -532,14 +551,14 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 				optimal = Integer.toString(matrix.getGurvic(Double.parseDouble(c.getText())));
 				message.setText("Результат по Гурвицу:Сратегия №" + optimal);
 				time = System.currentTimeMillis() - start;
-				messageTime.setText("Время выполнения :" + 9 + "ms");
+				messageTime.setText("Время выполнения :" + time + "ms");
 			}
 		});
 		buttonsForGame.add(gurvic);
 	}
 
 	void createBaesButton() {
-		JButton baes = new JButton("Байес");
+		JButton baes = new JButton("Критерий Байеса");
 		baes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				long start = System.currentTimeMillis();
@@ -643,6 +662,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 		createBaesButton();
 		createMonteButton();
 		createGurvicButton();
+		createThompsonButton();
 		createMessageError();
 		infoButton();
 		getContentPane().add(buttons, "North");

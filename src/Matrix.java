@@ -175,7 +175,7 @@ public class Matrix {
 	}
 	
 	public void test() throws IOException, InterruptedException {
-		InputStream is = Runtime.getRuntime().exec(new String[] {"python","src//Thompson.py"}).getInputStream();
+		InputStream is = Runtime.getRuntime().exec(new String[] {"python","src//tester.py"}).getInputStream();
         int i;
         while((i = is.read()) != -1)
         {
