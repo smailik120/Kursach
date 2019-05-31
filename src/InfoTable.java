@@ -16,6 +16,7 @@ public class InfoTable extends BaseFrame implements InterfaceObject{
 	private String[][] arrayMean;
 	private String[] columnsHeader;
 	private String name;
+	private JLabel label;
 	private JTable table1;
 	private DefaultTableModel tableModel;
 	private JPanel buttons;
@@ -31,10 +32,12 @@ public class InfoTable extends BaseFrame implements InterfaceObject{
 	@Override
 	public void CreateFrame() 
 	{
+		label = new JLabel();
 		tableModel = new DefaultTableModel(arrayMean, columnsHeader);
 		table1 = new JTable(tableModel);
 		Box contents = new Box(BoxLayout.Y_AXIS);
         contents.add(new JScrollPane(table1));
+        contents.add(label);
         setContentPane(contents);
         createPanel();
 	}
@@ -44,7 +47,9 @@ public class InfoTable extends BaseFrame implements InterfaceObject{
 		return table1;
 	}
 	
-	
+	JLabel getLavel() {
+		return label;
+	}
 	void createPanel() 
 	{
 		buttons = new JPanel();

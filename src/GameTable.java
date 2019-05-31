@@ -39,6 +39,8 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 	private String viewProb[][];
 	private String[][] meansAttack;
 	private String[][] meansDefense;
+	private String[][] comp;
+	HashSet<Pair<String, String>> defendAgainst;
 	private JButton info;
 	private JLabel messageTime;
 	private TreeSet<ArrayList<String>> strategiesDefense;
@@ -47,6 +49,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 	private String[] FieldDefense;
 	private String[] priceDefense;
 	private String[] priceAttack;
+	private String[] damage;
 	private long time;
 	private ArrayList<Strategy> defense;
 	private ArrayList<Strategy> attack;
@@ -226,7 +229,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 		strategiesAttack = worker.work(attack);
 		HashSet<Pair<String, String>> compability = new HashSet<Pair<String, String>>();
 		ArrayList<ArrayList<String>> array = new ArrayList<ArrayList<String>>();
-		String[][] comp = Database.getInstance().getTable("compability_defense", 3);
+		comp = Database.getInstance().getTable("compability_defense", 3);
 		for (int i = 0; i < comp.length; i++) {
 			compability.add(new Pair<String, String>(comp[i][1], comp[i][2]));
 		}
@@ -301,7 +304,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 		int tempSize = 0;
 		String[] temp;
 		String[] tempAt;
-		HashSet<Pair<String, String>> defendAgainst = new HashSet<>();
+		defendAgainst = new HashSet<>();
 		String[][] defAgainst = Database.getInstance().getTable("defend_against", 3);
 		// fill defenedAgaints of mysqlDb
 		for (int k = 0; k < defAgainst.length; k++) {
@@ -324,6 +327,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 			}
 		}
 		i = 0;
+		int attackDamage = 0;
 		for (ArrayList<String> at : strategiesAttack) {
 			i++;
 			for (ArrayList<String> def : strategiesDefense) {
@@ -363,7 +367,7 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 					if (!protect.contains(Integer.parseInt(tempAt[a]) - 1)) {
 						sum += Integer.parseInt(attack.get(Integer.parseInt(tempAt[a]) - 1).getStrategy()[2]);
 					}
-				}
+				}  
 				protect = new HashSet<Integer>();
 				meansGame[i][j] = Integer.toString(sum);
 			}
@@ -575,6 +579,11 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 		info.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String[][] info = null;
+				int damage = 0;
+				int proof[] = new int[priceAttack.length];
+				for(int k1 = 0; k1 < priceAttack.length; k1++) {
+					proof[k1] = 0;
+				}
 				String[] Defend = { "№", "Название", "Стоимость", "Дата", "Тип", "озу", "битность" };
 				int counter = 0;
 				int i = 0;
@@ -616,6 +625,16 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 											info[counter][Defend.length - 1] = bitDepth[t][1];
 										}
 									}
+									for (int t = 0; t < temp.length; t++) {
+										for(int k1 = 0; k1 < priceAttack.length; k1++) {
+											if(defendAgainst.contains(new Pair<String, String>(info[counter][0], Integer.toString(k1+1))) && chooseAttack.getValueAt(k1, 2).equals(true)) {
+												proof[k1]++;
+											}
+											if(chooseAttack.getValueAt(k1, 2).equals(false)) {
+												proof[k1]++;
+											}
+										}
+									}
 									counter++;
 								}
 							}
@@ -638,7 +657,14 @@ public class GameTable extends BaseFrame implements InterfaceObject {
 				 * name[optimal.charAt(i) - 48 - 1]; info[i][1] = cost[optimal.charAt(i) - 48 -
 				 * 1]; }
 				 */
+				for(int k1 = 0; k1 < priceAttack.length; k1++) {
+					if(proof[k1] == 0) {
+						System.out.println("attack" + k1);
+						damage = damage + Integer.parseInt(priceAttack[k1]);
+					}
+				}
 				InfoTable infoTable = new InfoTable(100, 100, 800, 800, info, Defend, "info");
+				infoTable.getLavel().setText("Максимальный Ущерб от атак =" + damage);
 				infoTable.setVisible(true);
 				infoTable.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			}
